@@ -9,6 +9,10 @@ ssh_port       = "22"
 document_root  = "~/website.com/"
 deploy_default = "rsync"
 
+## -- Amazon S3 Deploy config ##
+# Be sure to setup your s3config.yml file correctly (see s3 rake task below) 
+s3_bucket = "yourbucketname"
+
 # This will be configured for you when you run config_deploy
 deploy_branch  = "gh-pages"
 
@@ -222,6 +226,12 @@ desc "Deploy website via rsync"
 task :rsync do
   puts "## Deploying website via Rsync"
   ok_failed system("rsync -avze 'ssh -p #{ssh_port}' --delete #{public_dir}/ #{ssh_user}:#{document_root}")
+end
+
+desc "Deploy public directory to Amazon S3"
+task :s3 do
+  puts "## Deploying website to Amazon S3 bucket"
+  ok_failed system("export S3CONF=. && s3sync -vrp  #{public_dir}/ #{s3_bucket}:/")
 end
 
 desc "deploy public directory to github pages"
